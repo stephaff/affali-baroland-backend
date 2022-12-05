@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const validator = require('validator')
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
@@ -20,11 +21,13 @@ userSchema.statics.inscription = async function(email, password){
     if(!email || !password){
         throw Error('veuillez remplir tous les champs')
     }
-    
-    const exists = await this.findOne({ email })
 
-    if(exists){
-        throw Error('email existant')
+    if(!validator.isEmail(email)){
+        throw Error('email invalide')
+    }
+
+    if(!validator.isStrongPassword(password)){
+        throw Error('mot de passe invalide')
     }
 
     // const salt = await bcrypt.genSalt(10)
@@ -33,6 +36,7 @@ userSchema.statics.inscription = async function(email, password){
     // const user = await this.create({ email, password : hash })
 
     const user = await this.create({ email, password })
+
     return user
 
 }
